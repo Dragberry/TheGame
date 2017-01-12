@@ -1,0 +1,16 @@
+bin/
+target/
+obj/
+.gwt/
+gwt-unitCache/
+war/
+gen/
+
+*.class
+/build/
+*.iml
+build/
+.settings/
+.classpath*
+.project*
+.gradle/
