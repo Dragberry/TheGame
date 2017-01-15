@@ -7,10 +7,10 @@ import java.text.MessageFormat;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 
 import net.dragberry.thegame.util.CameraHelper;
 
@@ -62,34 +62,23 @@ public class WorldController extends InputAdapter {
 
     private void initTestObjects() {
         testSprites = new Sprite[5];
-        int width = 32;
-        int height = 32;
-
-        Pixmap pixmap = createProceduralPixmap(width, height);
-        Texture texture = new Texture(pixmap);
+        Array<TextureRegion> regions = new Array<>();
+        regions.addAll(
+        		Assets.instance.bunny.head,
+        		Assets.instance.feather.feather,
+        		Assets.instance.goldCoin.goldCoin
+        		);
         for (int index = 0; index < testSprites.length; index++) {
-            Sprite sprite = new Sprite(texture);
-            sprite.setSize(1, 1);
-            sprite.setOrigin(sprite.getWidth() / 2.0f, sprite.getHeight() / 2.0f);
-            float randomX = MathUtils.random(-2.0f, 2.0f);
-            float randomY = MathUtils.random(-2.0f, 2.0f);
-            sprite.setPosition(randomX, randomY);
-            testSprites[index] = sprite;
+        	Sprite sprite = new Sprite(regions.random());
+        	sprite.setSize(1, 1);
+        	sprite.setOrigin(sprite.getWidth() /2.0f, sprite.getHeight() / 2.0f);
+        	float randomX = MathUtils.random(-2.0f, 2.0f);
+        	float randomY = MathUtils.random(-2.0f, 2.0f);
+        	sprite.setPosition(randomX, randomY);
+        	testSprites[index] = sprite;
         }
-
-        selectedSprite = 1;
-    }
-
-    private Pixmap createProceduralPixmap(int width, int height) {
-        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
-        pixmap.setColor(1, 0, 0, 0.5f);
-        pixmap.fill();
-        pixmap.setColor(1, 1, 0, 1);
-        pixmap.drawLine(0, 0, width, height);
-        pixmap.drawLine(width, 0, 0, height);
-        pixmap.setColor(0, 1, 1, 1);
-        pixmap.drawRectangle(0, 0, width, height);
-        return pixmap;
+        	        
+        selectedSprite = 0;
     }
 
     public void update(float deltaTime) {
