@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 import net.dragberry.thegame.util.CameraHelper;
+import net.dragberry.thegame.util.Constants;
 
 /**
  * Created by maksim on 11.01.17.
@@ -22,9 +23,11 @@ public class WorldController extends InputAdapter {
     private static final String TAG = WorldController.class.getName();
     
     public CameraHelper cameraHelper;
-
-    public Sprite[] testSprites;
-    public int selectedSprite;
+    
+    public Level level;
+    public int lives;
+    public int score;
+    
 
     public WorldController() {
         init();
@@ -33,7 +36,13 @@ public class WorldController extends InputAdapter {
     private void init() {
     	Gdx.input.setInputProcessor(this);
     	cameraHelper = new CameraHelper();
-        initTestObjects();
+    	lives = Constants.LIVES_START;
+    	initLevel();
+    }
+    
+    private void initLevel() {
+    	score = 0;
+    	level = new Level(Constants.LEVEL_01);
     }
     
     @Override
@@ -44,15 +53,8 @@ public class WorldController extends InputAdapter {
     		Gdx.app.debug(TAG, "Game world has been resetted!");
 			break;
 		case Keys.SPACE:
-			selectedSprite = (selectedSprite + 1) % testSprites.length;
-			if (cameraHelper.hasTarget()) {
-				cameraHelper.setTarget(testSprites[selectedSprite]);
-			}
-			Gdx.app.debug(TAG, MessageFormat.format("Sprite #{0} is selected", selectedSprite));
 			break;
 		case Keys.ENTER:
-			cameraHelper.setTarget(cameraHelper.hasTarget() ? null : testSprites[selectedSprite]);
-			Gdx.app.debug(TAG, MessageFormat.format("Camera follow enabled: {0}", cameraHelper.hasTarget()));
 			break;
 		default:
 			break;
@@ -60,50 +62,15 @@ public class WorldController extends InputAdapter {
     	return false;
     }
 
-    private void initTestObjects() {
-        testSprites = new Sprite[5];
-        Array<TextureRegion> regions = new Array<>();
-        regions.addAll(
-        		Assets.instance.bunny.head,
-        		Assets.instance.feather.feather,
-        		Assets.instance.goldCoin.goldCoin
-        		);
-        for (int index = 0; index < testSprites.length; index++) {
-        	Sprite sprite = new Sprite(regions.random());
-        	sprite.setSize(1, 1);
-        	sprite.setOrigin(sprite.getWidth() /2.0f, sprite.getHeight() / 2.0f);
-        	float randomX = MathUtils.random(-2.0f, 2.0f);
-        	float randomY = MathUtils.random(-2.0f, 2.0f);
-        	sprite.setPosition(randomX, randomY);
-        	testSprites[index] = sprite;
-        }
-        	        
-        selectedSprite = 0;
-    }
 
     public void update(float deltaTime) {
     	handleDebugInput(deltaTime);
-        updateTestObjects(deltaTime);
         cameraHelper.update(deltaTime);
     }
 
     private void handleDebugInput(float deltaTime) {
 		if (Gdx.app.getType() != ApplicationType.Desktop) {
 			return;
-		}
-		
-		float sprMoveSpeed = 5 * deltaTime;
-		if (Gdx.input.isKeyPressed(Keys.A)) {
-			moveSelectedSprite(-sprMoveSpeed, 0);
-		}
-		if (Gdx.input.isKeyPressed(Keys.D)) {
-			moveSelectedSprite(sprMoveSpeed, 0);
-		}
-		if (Gdx.input.isKeyPressed(Keys.W)) {
-			moveSelectedSprite(0, sprMoveSpeed);
-		}
-		if (Gdx.input.isKeyPressed(Keys.S)) {
-			moveSelectedSprite(0, -sprMoveSpeed);
 		}
 		
 		float camMoveSpeed = 5 * deltaTime;
@@ -152,15 +119,5 @@ public class WorldController extends InputAdapter {
     	cameraHelper.setPosition(x, y);
     }
 
-	private void moveSelectedSprite(float x, float y) {
-		testSprites[selectedSprite].translate(x, y);
-	}
-
-	private void updateTestObjects(float deltaTime) {
-        float rotation = testSprites[selectedSprite].getRotation();
-        rotation += 90 * deltaTime;
-        rotation %= 360;
-        testSprites[selectedSprite].setRotation(rotation);
-    }
 
 }

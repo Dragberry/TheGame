@@ -103,7 +103,12 @@ public class Level {
 		Gdx.app.debug(TAG, "Level '" + fileName + "' loaded");
 	}
 	
-	public void render(SpriteBatch batch) {}
+	public void render(SpriteBatch batch) {
+		mountains.render(batch);
+		rocks.forEach(rock -> rock.render(batch));
+		waterOverlay.render(batch);
+		clouds.render(batch);
+	}
 	
 	
 

@@ -8,8 +8,13 @@ public interface Constants {
 
     float VIEWPORT_WIDTH = 5.0f;
     float VIEWPORT_HEIGHT = 5.0f;
+    
+    float VIEPORT_GUI_WIDTH = 800.0f;
+    float VIEPORT_GUI_HEIGHT = 480.0f;
 
-    public static final String TEXTURE_ATLAS_OBJECTS = "images/canyonbunny.pack";
+    String TEXTURE_ATLAS_OBJECTS = "images/canyonbunny.pack";
 
-    public static final String LEVEL_01 = "levels/level-01.png";
+    String LEVEL_01 = "levels/level-01.png";
+    
+    int LIVES_START = 3;
 }
