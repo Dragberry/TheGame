@@ -17,4 +17,5 @@ public interface Constants {
     String LEVEL_01 = "levels/level-01.png";
     
     int LIVES_START = 3;
+	float ITEM_FEATHER_POWERUP_DURATION = 9;
 }

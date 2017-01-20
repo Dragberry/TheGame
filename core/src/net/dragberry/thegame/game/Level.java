@@ -8,7 +8,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 
 import net.dragberry.thegame.game.objects.AbstractGameObject;
+import net.dragberry.thegame.game.objects.BunnyHead;
 import net.dragberry.thegame.game.objects.Clouds;
+import net.dragberry.thegame.game.objects.Feather;
+import net.dragberry.thegame.game.objects.GoldCoin;
 import net.dragberry.thegame.game.objects.Mountains;
 import net.dragberry.thegame.game.objects.Rock;
 import net.dragberry.thegame.game.objects.WaterOverlay;
@@ -39,6 +42,10 @@ public class Level {
 		}
 	}
 	
+	public BunnyHead bunnyHead;
+	public Array<GoldCoin> goldCoins;
+	public Array<Feather> feathers; 
+	
 	public Array<Rock> rocks;
 	
 	public Clouds clouds;
@@ -50,7 +57,11 @@ public class Level {
 	}
 	
 	private void init(String fileName) {
+		bunnyHead = null;
+		
 		rocks = new Array<>();
+		goldCoins = new Array<>();
+		feathers = new Array<>();
 		
 		Pixmap pixmap = new Pixmap(Gdx.files.internal(fileName));
 		int lastPixel = -1;
@@ -75,11 +86,20 @@ public class Level {
 						rocks.get(rocks.size - 1).increaseLength(1);
 					}
 				} else if (BLOCK_TYPE.PLAYER_SPAWNPOINT.sameColor(currentPixel)) {
-					
+					obj = new BunnyHead();
+					offsetHeight = -3.0f;
+					obj.position.set(pixelX, baseHeight * obj.dimension.y + offsetHeight);
+					bunnyHead = (BunnyHead) obj;
 				} else if (BLOCK_TYPE.ITEM_FEATHER.sameColor(currentPixel)) {
-					
+					obj = new Feather();
+					offsetHeight = -1.5f;
+					obj.position.set(pixelX, baseHeight * obj.dimension.y + offsetHeight);
+					feathers.add((Feather) obj);
 				} else if (BLOCK_TYPE.ITEM_GOLD_COIN.sameColor(currentPixel)) {
-					
+					obj = new GoldCoin();
+					offsetHeight = -1.5f;
+					obj.position.set(pixelX, baseHeight * obj.dimension.y + offsetHeight);
+					goldCoins.add((GoldCoin) obj);
 				} else {
 					int r = 0xff & (currentPixel >>> 24);
 					int g = 0xff & (currentPixel >>> 16);
@@ -106,8 +126,19 @@ public class Level {
 	public void render(SpriteBatch batch) {
 		mountains.render(batch);
 		rocks.forEach(rock -> rock.render(batch));
+		goldCoins.forEach(goldCoin -> goldCoin.render(batch));
+		feathers.forEach(feather -> feather.render(batch));
+		bunnyHead.render(batch);
 		waterOverlay.render(batch);
 		clouds.render(batch);
+	}
+	
+	public void update(float deltaTime) {
+		bunnyHead.update(deltaTime);
+		rocks.forEach(rock -> rock.update(deltaTime));
+		goldCoins.forEach(coin -> coin.update(deltaTime));
+		feathers.forEach(feather -> feather.update(deltaTime));
+		clouds.update(deltaTime);
 	}
 	
 	

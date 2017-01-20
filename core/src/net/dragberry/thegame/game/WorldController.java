@@ -10,8 +10,14 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 
+import net.dragberry.thegame.game.objects.BunnyHead;
+import net.dragberry.thegame.game.objects.Feather;
+import net.dragberry.thegame.game.objects.GoldCoin;
+import net.dragberry.thegame.game.objects.Rock;
+import net.dragberry.thegame.game.objects.BunnyHead.JUMP_STATE;
 import net.dragberry.thegame.util.CameraHelper;
 import net.dragberry.thegame.util.Constants;
 
@@ -28,6 +34,8 @@ public class WorldController extends InputAdapter {
     public int lives;
     public int score;
     
+    private Rectangle r1 = new Rectangle();
+    private Rectangle r2 = new Rectangle();
 
     public WorldController() {
         init();
@@ -65,6 +73,8 @@ public class WorldController extends InputAdapter {
 
     public void update(float deltaTime) {
     	handleDebugInput(deltaTime);
+    	level.update(deltaTime);
+    	testCollisions();
         cameraHelper.update(deltaTime);
     }
 
@@ -119,5 +129,76 @@ public class WorldController extends InputAdapter {
     	cameraHelper.setPosition(x, y);
     }
 
+    private void onCollisionBunnyWithRock(Rock rock) {
+    	BunnyHead bunnyHead = level.bunnyHead;
+    	float heightDifference = Math.abs(bunnyHead.position.y - (rock.position.y + rock.bounds.height));
+    	if (heightDifference > 0.25f) {
+    		boolean hitRightEdge = bunnyHead.position.x > (rock.position.x + rock.bounds.width / 2.0f);
+    		if (hitRightEdge) {
+    			bunnyHead.position.x = rock.position.x + rock.bounds.width;
+    		} else {
+    			bunnyHead.position.x = rock.position.x - bunnyHead.bounds.width;
+    		}
+    		return;
+    	}
+    	
+    	switch (bunnyHead.jumpState) {
+    	case GROUNDED:
+    		break;
+    	case FALLING:
+    	case JUMP_FALLING:
+    		bunnyHead.position.y = rock.position.y + bunnyHead.bounds.height + bunnyHead.origin.y;
+    		bunnyHead.jumpState = JUMP_STATE.GROUNDED;
+    		break;
+    	case JUMP_RISING:
+    		bunnyHead.position.y = rock.position.y + bunnyHead.bounds.height + bunnyHead.origin.y;
+    		break;
+    	}
+    }
+    
+    private void onCollisionBunnyWithGolCoin(GoldCoin coin) {
+    	coin.collected = true;
+    	score += coin.getScore();
+    	Gdx.app.log(TAG,  "Gold coin collected");
+    }
+    
+    private void onCollisionBunnyWithFeather(Feather feather) {
+    	feather.collected = true;
+    	score += feather.getScore();
+    	level.bunnyHead.setFeatherPowerup(true);
+    	Gdx.app.log(TAG,  "Feather collected");
+    	
+    }
+    
+    private void testCollisions() {
+    	r1.set(level.bunnyHead.position.x, level.bunnyHead.position.y,
+    			level.bunnyHead.bounds.width, level.bunnyHead.bounds.height);
+    	for (Rock rock : level.rocks) {
+    		r2.set(rock.position.x, rock.position.y, rock.bounds.width, rock.bounds.height);
+    		if (!r1.overlaps(r2)) {
+    			continue;
+    		}
+    		onCollisionBunnyWithRock(rock);
+    		break;
+    	}
+    	
+    	for (GoldCoin coin : level.goldCoins) {
+    		r2.set(coin.position.x, coin.position.y, coin.bounds.width, coin.bounds.height);
+    		if (!r1.overlaps(r2)) {
+    			continue;
+    		}
+    		onCollisionBunnyWithGolCoin(coin);
+    		break;
+    	}
+    	
+    	for (Feather feather : level.feathers) {
+    		r2.set(feather.position.x, feather.position.y, feather.bounds.width, feather.bounds.height);
+    		if (!r1.overlaps(r2)) {
+    			continue;
+    		}
+    		onCollisionBunnyWithFeather(feather);
+    		break;
+    	}
+    }
 
 }
