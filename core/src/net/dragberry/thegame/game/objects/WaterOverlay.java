@@ -28,7 +28,7 @@ public class WaterOverlay extends AbstractGameObject {
 		TextureRegion reg = null;
 		reg = regWaterOverlay;
 		batch.draw(reg.getTexture(),
-				position.x + origin.x, position.y + position.y,
+				position.x + origin.x, position.y + origin.y,
 				origin.x, origin.y,
 				dimension.x, dimension.y,
 				scale.x, scale.y,

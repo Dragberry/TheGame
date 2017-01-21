@@ -1,5 +1,8 @@
 package net.dragberry.thegame.game.objects;
 
+import java.text.MessageFormat;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -34,6 +37,10 @@ public class BunnyHead extends AbstractGameObject {
 		init();
 	}
 	
+	@Override
+	public String toString() {
+		return MessageFormat.format("velocity:{0}", velocity);
+	}
 	
 	@Override
 	protected void init() {
@@ -43,7 +50,7 @@ public class BunnyHead extends AbstractGameObject {
 		bounds.set(0, 0, dimension.x, dimension.y);
 		terminalVelocity.set(3.0f, 4.0f);
 		friction.set(12.0f,  0.0f);
-		acceleration.set(0.0f, -0.25f);
+		acceleration.set(0.0f, -9.81f);
 		viewDirection = VIEW_DIRECTION.RIGHT;
 		jumpState = JUMP_STATE.FALLING;
 		timeJumping = 0;

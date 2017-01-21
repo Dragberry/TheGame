@@ -18,4 +18,8 @@ public interface Constants {
     
     int LIVES_START = 3;
 	float ITEM_FEATHER_POWERUP_DURATION = 9;
+	
+	float TIME_DELAY_GAME_OVER = 3;
+	
+	
 }

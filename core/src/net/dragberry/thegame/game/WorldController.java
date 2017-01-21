@@ -3,16 +3,9 @@ package net.dragberry.thegame.game;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Input.Keys;
 
-import java.text.MessageFormat;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
-
 import net.dragberry.thegame.game.objects.BunnyHead;
 import net.dragberry.thegame.game.objects.Feather;
 import net.dragberry.thegame.game.objects.GoldCoin;
@@ -36,6 +29,8 @@ public class WorldController extends InputAdapter {
     
     private Rectangle r1 = new Rectangle();
     private Rectangle r2 = new Rectangle();
+    
+    private float timeLeftGameOverDelay;
 
     public WorldController() {
         init();
@@ -45,12 +40,14 @@ public class WorldController extends InputAdapter {
     	Gdx.input.setInputProcessor(this);
     	cameraHelper = new CameraHelper();
     	lives = Constants.LIVES_START;
+    	timeLeftGameOverDelay = 0;
     	initLevel();
     }
     
     private void initLevel() {
     	score = 0;
     	level = new Level(Constants.LEVEL_01);
+    	cameraHelper.setTarget(level.bunnyHead);
     }
     
     @Override
@@ -60,9 +57,8 @@ public class WorldController extends InputAdapter {
 			init();
     		Gdx.app.debug(TAG, "Game world has been resetted!");
 			break;
-		case Keys.SPACE:
-			break;
 		case Keys.ENTER:
+			cameraHelper.setTarget(cameraHelper.hasTarget() ? null : level.bunnyHead);
 			break;
 		default:
 			break;
@@ -73,9 +69,42 @@ public class WorldController extends InputAdapter {
 
     public void update(float deltaTime) {
     	handleDebugInput(deltaTime);
+    	if (isGameOver()) {
+    		timeLeftGameOverDelay -= deltaTime;
+    		if (timeLeftGameOverDelay < 0) {
+    			init();
+    		}
+    	} else {
+    		handleInputGame(deltaTime);
+    	}
     	level.update(deltaTime);
     	testCollisions();
         cameraHelper.update(deltaTime);
+        if (!isGameOver() && isPlayerInWater()) {
+        	lives--;
+        	if (isGameOver()){
+        		timeLeftGameOverDelay = Constants.TIME_DELAY_GAME_OVER;
+        	} else {
+        		initLevel();
+        	}
+        }
+    }
+    
+    private void handleInputGame(float deltaTime) {
+    	if (cameraHelper.hasTarget(level.bunnyHead)) {
+    		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+    			level.bunnyHead.velocity.x = -level.bunnyHead.terminalVelocity.x;
+    		} else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+    			level.bunnyHead.velocity.x = level.bunnyHead.terminalVelocity.x;
+    		} else {
+    			if (Gdx.app.getType() != ApplicationType.Desktop) {
+    				level.bunnyHead.velocity.x = level.bunnyHead.terminalVelocity.x;
+    			}
+    		}
+    		
+    		// Bunny jump
+			level.bunnyHead.setJumping(Gdx.input.isTouched() || Gdx.input.isKeyPressed(Keys.SPACE));
+    	}
     }
 
     private void handleDebugInput(float deltaTime) {
@@ -83,26 +112,28 @@ public class WorldController extends InputAdapter {
 			return;
 		}
 		
-		float camMoveSpeed = 5 * deltaTime;
-		float camMoveSpeedAccelerationFactor = 5;
-		
-		if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
-			camMoveSpeed *= camMoveSpeedAccelerationFactor;
-		}
-		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-			moveCamera(-camMoveSpeed, 0);
-		}
-		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			moveCamera(camMoveSpeed, 0);
-		}
-		if (Gdx.input.isKeyPressed(Keys.UP)) {
-			moveCamera(0, camMoveSpeed);
-		}
-		if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-			moveCamera(0, -camMoveSpeed);
-		}
-		if (Gdx.input.isKeyPressed(Keys.BACKSPACE)) {
-			cameraHelper.setPosition(0, 0);
+		if (!cameraHelper.hasTarget(level.bunnyHead)) {
+			float camMoveSpeed = 5 * deltaTime;
+			float camMoveSpeedAccelerationFactor = 5;
+			
+			if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
+				camMoveSpeed *= camMoveSpeedAccelerationFactor;
+			}
+			if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+				moveCamera(-camMoveSpeed, 0);
+			}
+			if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+				moveCamera(camMoveSpeed, 0);
+			}
+			if (Gdx.input.isKeyPressed(Keys.UP)) {
+				moveCamera(0, camMoveSpeed);
+			}
+			if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+				moveCamera(0, -camMoveSpeed);
+			}
+			if (Gdx.input.isKeyPressed(Keys.BACKSPACE)) {
+				cameraHelper.setPosition(0, 0);
+			}
 		}
 		
 		float camZoomSpeed = 1 * deltaTime;
@@ -199,6 +230,14 @@ public class WorldController extends InputAdapter {
     		onCollisionBunnyWithFeather(feather);
     		break;
     	}
+    }
+    
+    public boolean isGameOver() {
+    	return lives < 0;
+    }
+    
+    public boolean isPlayerInWater() {
+    	return level.bunnyHead.position.y < -5;
     }
 
 }

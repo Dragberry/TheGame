@@ -119,6 +119,39 @@ public class WorldRenderer implements Disposable {
 	   renderGuiScore(batch);
 	   renderGuiExtraLive(batch);
 	   renderGuiFpsCounter(batch);
+	   renderGuiGameOverMessage(batch);
+	   renderGuiFeatherPowerup(batch);
 	   batch.end();
+   }
+   
+   private void renderGuiGameOverMessage(SpriteBatch batch) {
+	   float x = cameraGUI.viewportWidth / 2;
+	   float y = cameraGUI.viewportHeight / 2;
+	   if (worldController.isGameOver()) {
+		   BitmapFont fontGameOver = Assets.instance.fonts.defaultBig;
+		   fontGameOver.setColor(1, 0.75f, 0.25f, 1);
+		   fontGameOver.draw(batch,
+				   "GAME OVER",
+				   x, y);
+		   fontGameOver.setColor(1, 1, 1, 1);
+	   }
+   }
+   
+   private void renderGuiFeatherPowerup(SpriteBatch batch) {
+	   float x = -15;
+	   float y = 30;
+	   float timeLeftFeatherPowerup = worldController.level.bunnyHead.timeLeftFeatherPowerUp;
+	   if (timeLeftFeatherPowerup > 0) {
+		   if (timeLeftFeatherPowerup < 4) {
+			   if (((int)(timeLeftFeatherPowerup * 5) % 2) != 0) {
+				   batch.setColor(1, 1, 1, 1);
+			   }
+		   }
+		   batch.draw(Assets.instance.feather.feather,
+				   x, y, 50, 50, 100, 100, 0.35f, -0.35f, 0);
+		   Assets.instance.fonts.defaultSmall.draw(batch,
+				   "" + (int)timeLeftFeatherPowerup,
+				   x + 60, y + 57);
+	   }
    }
 }
