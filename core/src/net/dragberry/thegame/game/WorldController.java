@@ -1,6 +1,7 @@
 package net.dragberry.thegame.game;
 
 import com.badlogic.gdx.Application.ApplicationType;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input.Keys;
 
 import com.badlogic.gdx.Gdx;
@@ -10,6 +11,7 @@ import net.dragberry.thegame.game.objects.BunnyHead;
 import net.dragberry.thegame.game.objects.Feather;
 import net.dragberry.thegame.game.objects.GoldCoin;
 import net.dragberry.thegame.game.objects.Rock;
+import net.dragberry.thegame.screen.MenuScreen;
 import net.dragberry.thegame.game.objects.BunnyHead.JUMP_STATE;
 import net.dragberry.thegame.util.CameraHelper;
 import net.dragberry.thegame.util.Constants;
@@ -20,6 +22,8 @@ import net.dragberry.thegame.util.Constants;
 public class WorldController extends InputAdapter {
 
     private static final String TAG = WorldController.class.getName();
+    
+    private Game game;
     
     public CameraHelper cameraHelper;
     
@@ -32,7 +36,8 @@ public class WorldController extends InputAdapter {
     
     private float timeLeftGameOverDelay;
 
-    public WorldController() {
+    public WorldController(Game game) {
+    	this.game = game;
         init();
     }
 
@@ -60,6 +65,10 @@ public class WorldController extends InputAdapter {
 		case Keys.ENTER:
 			cameraHelper.setTarget(cameraHelper.hasTarget() ? null : level.bunnyHead);
 			break;
+		case Keys.ESCAPE:
+		case Keys.BACK:
+			backToMenu();
+			break;
 		default:
 			break;
 		}
@@ -72,7 +81,7 @@ public class WorldController extends InputAdapter {
     	if (isGameOver()) {
     		timeLeftGameOverDelay -= deltaTime;
     		if (timeLeftGameOverDelay < 0) {
-    			init();
+    			backToMenu();
     		}
     	} else {
     		handleInputGame(deltaTime);
@@ -238,6 +247,10 @@ public class WorldController extends InputAdapter {
     
     public boolean isPlayerInWater() {
     	return level.bunnyHead.position.y < -5;
+    }
+    
+    private void backToMenu() {
+    	game.setScreen(new MenuScreen(game));
     }
 
 }
