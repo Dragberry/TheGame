@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 
 import net.dragberry.thegame.game.WorldController;
 import net.dragberry.thegame.game.WorldRenderer;
+import net.dragberry.thegame.util.GamePreferences;
 
 public class GameScreen extends AbstractGameScreen implements Screen {
 	
@@ -39,6 +40,7 @@ public class GameScreen extends AbstractGameScreen implements Screen {
 
 	@Override
 	public void show() {
+		GamePreferences.instance.load();
 		worldController = new WorldController(game);
 		worldRenderer = new WorldRenderer(worldController);
 		Gdx.input.setCatchBackKey(true);

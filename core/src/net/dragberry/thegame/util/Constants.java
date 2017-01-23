@@ -25,5 +25,6 @@ public interface Constants {
 	String TEXTURE_ATLAS_LIBGDX_UI = "images/uiskin.atlas";
 	String SKIN_LIBGDX_UI = "images/uiskin.json";
 	String SKIN_CANYONBUNNY_UI = "images/canyonbunny-ui.json";
+	String PREFERENCES = "canyonbunny.prefs";
 	
 }

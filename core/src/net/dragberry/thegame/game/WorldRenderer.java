@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.dragberry.thegame.util.Constants;
+import net.dragberry.thegame.util.GamePreferences;
 
 /**
  * Created by maksim on 11.01.17.
@@ -118,9 +119,13 @@ public class WorldRenderer implements Disposable {
 	   batch.begin();
 	   renderGuiScore(batch);
 	   renderGuiExtraLive(batch);
-	   renderGuiFpsCounter(batch);
 	   renderGuiGameOverMessage(batch);
 	   renderGuiFeatherPowerup(batch);
+	   
+	   if (GamePreferences.instance.showFpsCounter) {
+		   renderGuiFpsCounter(batch);
+	   }
+	   
 	   batch.end();
    }
    

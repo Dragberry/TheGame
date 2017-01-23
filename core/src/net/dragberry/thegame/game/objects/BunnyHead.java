@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import net.dragberry.thegame.game.Assets;
+import net.dragberry.thegame.util.CharacterSkin;
 import net.dragberry.thegame.util.Constants;
+import net.dragberry.thegame.util.GamePreferences;
 
 public class BunnyHead extends AbstractGameObject {
 	
@@ -97,6 +99,9 @@ public class BunnyHead extends AbstractGameObject {
 	@Override
 	public void render(SpriteBatch batch) {
 		TextureRegion reg = null;
+		
+		batch.setColor(CharacterSkin.values()[GamePreferences.instance.charSkin].getColor());
+		
 		if (hasFeatherPowerup) {
 			batch.setColor(1.0f, 0.8f, 0.0f, 1.0f);
 		}
